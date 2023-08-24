@@ -136,6 +136,7 @@ namespace NSprites
         private readonly Mesh _mesh;
         private readonly Bounds _bounds;
         private readonly MaterialPropertyBlock _materialPropertyBlock;
+        private readonly int _layerMask;
         /// <summary> minimum additional capacity we want allocate on exceed </summary>
         private readonly int _minCapacityStep;
 
@@ -199,6 +200,9 @@ namespace NSprites
             _bounds = bounds;
             _materialPropertyBlock = override_MPB ?? new();
             _minCapacityStep = minCapacityStep;
+            _layerMask = _layerMask > 0
+                ? _layerMask
+                : LayerMask.NameToLayer("Units");
 
 #if !NSPRITES_REACTIVE_DISABLE || !NSPRITES_STATIC_DISABLE
             ReactiveAndStaticAllocationCounter.Allocated = preallocatedSpace;
@@ -573,7 +577,7 @@ namespace NSprites
         public void Draw()
         {
             if(_entityCount != 0)
-                Graphics.DrawMeshInstancedProcedural(_mesh, 0, Material, _bounds, _entityCount, _materialPropertyBlock);
+                Graphics.DrawMeshInstancedProcedural(_mesh, 0, Material, _bounds, _entityCount, _materialPropertyBlock, layer: _layerMask);
         }
         
         /// <summary><inheritdoc cref="CompleteUpdate"/>
